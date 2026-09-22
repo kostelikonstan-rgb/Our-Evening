@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Evening</title>
+<meta name="description" content="Приглашение на свадьбу">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Forum&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* Если фото из папки photos/ ещё нет — подставляем временную картинку */
+  function ph(img) {
+    img.onerror = null;
+    const [w, h] = (img.dataset.ph || "800x1000").split("x");
+    img.src = "https://picsum.photos/seed/" + img.getAttribute("src").replace(/[^a-z0-9]/gi, "-") + "/" + w + "/" + h;
+  }
+</script>
+<style>
+  :root {
+    --bg: #f7f6f7;
+    --ink: #2a2a2f;
+    --muted: #6f6c6c;
+    --script-soft: #cdbfb0;
+    --paper: #d8cfc4;
+    --btn: #2b2b33;
+    --heart: #b3222e;
+    --line: #2a2a2f;
+    --caps: "Forum", "Cormorant Garamond", serif;
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --script: "Great Vibes", cursive;
+    --sans: "Montserrat", Arial, sans-serif;
+    --ease: cubic-bezier(.22, .61, .36, 1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 15px; line-height: 1.55; font-weight: 400;
+    overflow-x: hidden;
+  }
+  body.loading { overflow: hidden; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  /* ---------- общие ---------- */
+  section { position: relative; padding: 110px 16px; overflow: hidden; }
+  .wrap { max-width: 1100px; margin: 0 auto; position: relative; }
+  .center { text-align: center; }
+  .caps {
+    font-family: var(--caps); font-weight: 400; text-transform: uppercase;
+    letter-spacing: .22em; line-height: 1.15;
+  }
+  .script { font-family: var(--script); font-weight: 400; line-height: 1; }
+  .script--soft { color: var(--script-soft); }
+  .h-caps { font-size: clamp(26px, 4.2vw, 44px); }
+  .text { font-size: 14px; color: var(--ink); max-width: 440px; }
+  .text p + p { margin-top: 12px; }
+  .btn {
+    display: inline-block; min-width: 240px; padding: 15px 30px;
+    background: var(--btn); color: #fff; border: 1px solid var(--btn);
+    font-family: var(--sans); font-size: 14px; font-weight: 500; text-decoration: none; text-align: center;
+    cursor: pointer; transition: background .35s, color .35s;
+  }
+  .btn:hover { background: transparent; color: var(--btn); }
+
+  .paper {
+    background-color: var(--paper);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeDiffuseLighting lighting-color='%23fff' surfaceScale='3'%3E%3CfeDistantLight azimuth='225' elevation='55'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+    background-blend-mode: multiply;
+    background-size: 900px 900px;
+  }
+
+  /* ---------- анимации появления ---------- */
+  .rv { opacity: 0; transform: translateY(40px); transition: opacity 1.2s var(--ease), transform 1.2s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-left { opacity: 0; transform: translateX(-60px); transition: opacity 1.3s var(--ease), transform 1.3s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-right { opacity: 0; transform: translateX(60px); transition: opacity 1.3s var(--ease), transform 1.3s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-zoom { opacity: 0; transform: scale(.92); transition: opacity 1.4s var(--ease), transform 1.6s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-fade { opacity: 0; transition: opacity 1.4s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-write {
+    opacity: 0; clip-path: inset(-30% 100% -30% -10%);
+    transition: clip-path 1.8s var(--ease), opacity .6s ease; transition-delay: var(--d, 0s);
+  }
+  .rv-line { transform: scaleX(0); transition: transform 1.4s var(--ease); transition-delay: var(--d, 0s); }
+  .rv-vline { transform: scaleY(0); transform-origin: top; transition: transform 1.6s var(--ease); transition-delay: var(--d, 0s); }
+  .in.rv, .in.rv-left, .in.rv-right, .in.rv-fade { opacity: 1; transform: none; }
+  .in.rv-zoom { opacity: 1; transform: none; }
+  .in.rv-write { opacity: 1; clip-path: inset(-30% -10% -30% -10%); }
+  .in.rv-line { transform: scaleX(1); }
+  .in.rv-vline { transform: scaleY(1); }
+  .draw path, .draw circle, .draw rect, .draw line { stroke-dasharray: var(--len, 1000); stroke-dashoffset: var(--len, 1000); transition: stroke-dashoffset 2.2s var(--ease); transition-delay: var(--d, 0s); }
+  .draw.in path, .draw.in circle, .draw.in rect, .draw.in line { stroke-dashoffset: 0; }
+
+  /* ---------- загрузка ---------- */
+  .loader {
+    position: fixed; inset: 0; z-index: 100; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .8s ease, visibility .8s ease;
+  }
+  .loader.done { opacity: 0; visibility: hidden; }
+  .loader svg { width: 46px; height: 46px; animation: beat 1.1s ease-in-out infinite; }
+  @keyframes beat { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.18); } 60% { transform: scale(.96); } }
+
+  /* ---------- 1. Hero ---------- */
+  .hero { padding-top: 90px; padding-bottom: 90px; text-align: center; }
+  .hero__title { font-size: clamp(30px, 5.6vw, 64px); letter-spacing: .2em; margin-right: -.2em; }
+  .hero__rule { width: min(360px, 60%); height: 1px; background: var(--line); margin: 26px auto 18px; }
+  .hero__names { display: block; width: min(600px, 90%); height: auto; margin: 0 auto; }
+  .hero__photo { margin: 60px auto 0; max-width: 1000px; aspect-ratio: 16 / 9; overflow: hidden; }
+  .hero__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; filter: grayscale(1) contrast(1.05); }
+  .hero__date {
+    margin-top: 44px; display: flex; justify-content: center; align-items: center; gap: 26px;
+    font-family: var(--caps); font-size: clamp(20px, 2.4vw, 28px); letter-spacing: .3em;
+  }
+  .hero__date i { width: 1px; height: 30px; background: var(--line); }
+
+  /* ---------- 2. Мы станем семьёй ---------- */
+  .family { padding: 0; }
+  .family__grid { display: grid; grid-template-columns: 36% 1fr; min-height: 640px; align-items: stretch; }
+  .family__photo { overflow: hidden; }
+  .family__photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+  .family__content { align-self: center; padding: 80px 40px 80px 140px; }
+  .family__head { display: inline-block; }
+  .family__head .script { display: block; font-size: 120px; line-height: .9; position: relative; top: -22px; }
+  .family__head .caps { font-size: clamp(24px, 3vw, 36px); letter-spacing: .12em; margin: -18px 0 0 120px; white-space: nowrap; }
+  .family__content .text { margin-top: 36px; margin-left: 120px; }
+
+  /* ---------- 5. Мы ждём вас ---------- */
+  .wait { padding-top: 130px; padding-bottom: 130px; }
+  .wait__title { text-align: center; position: relative; }
+  .wait__title .caps { font-size: clamp(28px, 4.4vw, 48px); letter-spacing: .3em; }
+  .wait__title .script { position: absolute; left: 58%; top: -30px; font-size: 110px; }
+  .wait__body { display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; margin-top: 60px; align-items: start; }
+  .bignums { font-family: var(--serif); font-weight: 400; font-size: clamp(56px, 7vw, 84px); line-height: 1.15; justify-self: start; padding-left: 40px; }
+  .vline-l, .vline-r { position: absolute; width: 1px; background: var(--line); top: 0; }
+  .vline-l { left: 40px; height: 180px; }
+  .vline-r { right: 40px; height: 100%; }
+  .calendar { width: 340px; border: 1px solid #9d9a9a; padding: 26px 24px 30px; background: var(--bg); }
+  .calendar__month { font-family: var(--script); font-size: 58px; text-align: center; margin-bottom: 18px; }
+  .calendar__grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 10px; font-family: var(--serif); font-size: 21px; text-align: center; }
+  .calendar__grid span { position: relative; }
+  .calendar__heart { position: absolute; left: 50%; top: 50%; width: 60px; height: 58px; transform: translate(-50%, -54%); overflow: visible; pointer-events: none; }
+  .calendar__heart path { fill: none; stroke: var(--heart); stroke-width: 2.2; stroke-linecap: round; }
+
+  /* ---------- 6. Локация ---------- */
+  .loc { text-align: center; }
+  .loc .script { font-size: clamp(80px, 11vw, 130px); }
+  .loc .caps { font-size: clamp(22px, 3vw, 34px); letter-spacing: .14em; margin-top: 10px; }
+  .loc__photos { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 40px; align-items: center; margin-top: 50px; }
+  .loc__side {
+    position: relative; aspect-ratio: 1 / 1.1; padding: 14px;
+    background: #fff; box-shadow: 0 14px 34px rgba(60, 45, 30, .18), 0 2px 6px rgba(60, 45, 30, .08);
+    transition: rotate .8s var(--ease), box-shadow .8s var(--ease), opacity 1.3s var(--ease) var(--d, 0s), transform 1.3s var(--ease) var(--d, 0s);
+  }
+  .loc__side::after { /* тонкая внутренняя линия-паспарту */
+    content: ""; position: absolute; inset: 6px; border: 1px solid #cdbfb0; pointer-events: none;
+  }
+  .loc__side:first-child { rotate: -4deg; }
+  .loc__side:last-child { rotate: 4deg; }
+  .loc__side:hover { rotate: 0deg; box-shadow: 0 20px 44px rgba(60, 45, 30, .24), 0 2px 6px rgba(60, 45, 30, .08); }
+  .loc__side img { outline: 1px solid rgba(0, 0, 0, .06); outline-offset: -1px; }
+  .loc__side img, .loc__card img { width: 100%; height: 100%; object-fit: cover; }
+  .loc__card img { object-position: 50% 25%; }
+  .loc__card { background: #fff; padding: 16px 16px 26px; box-shadow: 0 10px 40px rgba(0,0,0,.08); }
+  .loc__card .img { aspect-ratio: 1 / .95; overflow: hidden; }
+  .loc__name { font-family: var(--caps); font-size: 30px; letter-spacing: .12em; margin-top: 20px; }
+  .loc__addr { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .loc .btn { margin-top: 36px; }
+
+  .slider { position: relative; }
+  .slider__stage { position: relative; display: grid; }
+  .slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .8s ease, visibility .8s; }
+  .slide.active { opacity: 1; visibility: visible; }
+  .slider__nav { display: flex; align-items: center; justify-content: center; gap: 36px; margin-top: 22px; font-size: 16px; }
+  .slider__nav button { background: none; border: 0; cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+  .slider__nav svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 1.3; }
+
+  /* ---------- 9. Таймер ---------- */
+  .countdown { text-align: center; }
+  .countdown .caps { font-size: clamp(22px, 3.2vw, 36px); letter-spacing: .12em; }
+  .torn { position: relative; max-width: 700px; margin: 40px auto 0; filter: drop-shadow(0 6px 10px rgba(0,0,0,.08)); }
+  .torn__back, .torn__front { position: absolute; inset: 0; }
+  .torn__back { background: #fff; }
+  .torn__front { inset: 8px 0; background: #e8e7e8; }
+  .timer { position: relative; display: flex; justify-content: center; gap: clamp(20px, 5vw, 60px); padding: 44px 20px 50px; }
+  .timer__num { font-family: var(--serif); font-size: clamp(48px, 7vw, 80px); line-height: 1; }
+  .timer__label { font-family: var(--script); font-size: clamp(22px, 2.6vw, 30px); margin-top: -4px; }
+
+  /* ---------- 10. Пожелания ---------- */
+  .wish .script--title { font-size: clamp(76px, 11vw, 130px); text-align: center; }
+  .wish__grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 60px; align-items: center; margin-top: 40px; }
+  .wish__icon { justify-self: center; width: min(260px, 70%); }
+  .wish__icon svg { width: 100%; fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+  .wish__rule { width: 190px; height: 1px; background: var(--line); margin: 0 auto 36px; }
+  .wish .slide p { font-size: 17px; max-width: 460px; }
+  .wish .slider__nav { justify-content: center; margin-top: 30px; }
+  .wish__right { text-align: left; }
+  .wish__right .btn-row { text-align: center; max-width: 460px; }
+
+  /* ---------- 11. Контакты ---------- */
+  .contacts { text-align: center; }
+  .contacts__title { position: relative; display: inline-block; }
+  .contacts__title .script { font-size: 110px; position: absolute; left: -90px; top: -58px; }
+  .contacts__title .caps { position: relative; font-size: clamp(26px, 3.4vw, 38px); letter-spacing: .12em; }
+  .contacts .sub { font-size: 13px; margin-top: 30px; }
+  .contacts__people { display: flex; justify-content: center; gap: 110px; flex-wrap: wrap; margin-top: 18px; }
+  .person__name { height: 70px; width: auto; margin: 0 auto; }
+  .person a { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; text-decoration: none; margin-top: 10px; }
+  .person svg { width: 15px; height: 15px; fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .contacts .btn { margin-top: 26px; }
+
+  /* ---------- 12. Фото с сердцем ---------- */
+  .final { padding-top: 40px; padding-bottom: 60px; }
+  .final__photo { max-width: 620px; margin: 0 auto; position: relative; }
+  .final__photo .img { aspect-ratio: 2 / 3; overflow: hidden; }
+  .final__photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+  .final__heart { position: absolute; right: -60px; bottom: -70px; width: 120px; overflow: visible; }
+  .final__heart path { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; }
+
+  /* ---------- 14. Футер ---------- */
+  .footer { padding: 90px 16px 0; text-align: center; }
+  .footer .caps { font-size: clamp(26px, 3.6vw, 40px); letter-spacing: .1em; position: relative; z-index: 2; }
+  .footer__paper { position: relative; margin-top: -10px; height: 360px; }
+  .footer__edge-back, .footer__edge-front { position: absolute; inset: 0; }
+  .footer__edge-back { background: #fff; }
+  .footer__edge-front { top: 10px; background: #ecebec; }
+  .footer__sign { position: absolute; left: 0; right: 0; top: 80px; }
+  .footer__sign .soft { font-size: clamp(90px, 13vw, 170px); color: var(--script-soft); opacity: .8; }
+  .footer__sign .names { position: absolute; left: 50%; top: 40px; width: clamp(220px, 28vw, 380px); height: auto; }
+
+  /* ---------- Мобильная версия ---------- */
+  @media (max-width: 860px) {
+    section { padding: 80px 16px; }
+    .family__grid { grid-template-columns: 1fr; min-height: 0; }
+    .family__photo { height: 420px; }
+    .family__content { padding: 60px 0 70px; text-align: center; }
+    .family__head .script { font-size: 90px; }
+    .family__head .caps { margin: -12px 0 0 60px; }
+    .family__content .text { margin: 30px auto 0; }
+    .wait__body { grid-template-columns: 1fr; justify-items: center; gap: 20px; }
+    .wait__title .script { left: 55%; font-size: 80px; top: -20px; }
+    .bignums { padding-left: 0; display: flex; gap: 22px; justify-self: center; }
+    .vline-l, .vline-r { display: none; }
+    .calendar { width: min(340px, 100%); }
+    .loc__photos { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .loc__card { grid-column: 1 / 3; grid-row: 1; }
+    .wish__grid { grid-template-columns: 1fr; gap: 30px; }
+    .wish__right { text-align: center; }
+    .wish .slide p { margin: 0 auto; }
+    .wish__right .btn-row { margin: 0 auto; }
+    .contacts__title .script { left: -50px; font-size: 80px; top: -40px; }
+    .contacts__people { gap: 40px; }
+    .final__heart { width: 80px; right: 4%; bottom: -50px; }
+    .footer__paper { height: 300px; }
+    .footer__sign .names { left: 30%; top: 30px; }
+  }
+  @media (max-width: 480px) {
+    .hero__date { gap: 14px; letter-spacing: .18em; }
+    .family__head .script { font-size: 72px; }
+    .family__head .caps { margin: -10px 0 0 40px; }
+    .btn { min-width: 0; width: 100%; max-width: 320px; }
+    .timer { gap: 14px; }
+  }
+  .static *, .static *::before { transition: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .rv, .rv-left, .rv-right, .rv-zoom, .rv-fade, .rv-write, .rv-line, .rv-vline { opacity: 1 !important; transform: none !important; clip-path: none !important; transition: none !important; }
+    .draw path, .draw circle, .draw rect, .draw line { stroke-dashoffset: 0 !important; transition: none !important; }
+    .loader svg { animation: none; }
+  }
+</style>
+</head>
+<body class="loading">
+
+<!-- ================= Загрузка ================= -->
+<div class="loader" id="loader" aria-hidden="true">
+  <svg viewBox="0 0 24 24"><path fill="#b3222e" d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.6h2c.7-1.4 2.2-2.6 4.3-2.6 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z"/></svg>
+</div>
+
+<!-- ================= 1. Первый экран ================= -->
+<header class="hero">
+  <h1 class="caps hero__title rv" data-hero>Our Evening</h1>
+  <div class="hero__rule rv-line" data-hero style="--d:.3s"></div>
+  <img class="hero__names rv-write" data-hero style="--d:.5s" src="assets/names.png" alt="Константин и Юлия">
+  <div class="hero__photo rv-zoom" data-hero style="--d:.7s">
+    <img src="photos/hero.jpg" data-ph="1600x900" alt="" onerror="ph(this)">
+  </div>
+  <div class="hero__date rv">
+    <span data-f="dateFull"></span><i></i><span data-f="time"></span>
+  </div>
+</header>
+
+<!-- ================= 2. Наш особенный день ================= -->
+<section class="family paper">
+  <div class="family__grid">
+    <div class="family__photo rv-left"><img src="photos/family.jpg" data-ph="800x1100" alt="" onerror="ph(this)"></div>
+    <div class="family__content">
+      <div class="family__head">
+        <span class="script rv-write" style="--d:.5s">Наш</span>
+        <div class="caps rv" style="--d:.7s">особенный день!</div>
+      </div>
+      <div class="text rv" style="--d:.9s">
+        <p>Если вы читаете этот текст, значит, совсем скоро вы разделите с нами один из самых важных и светлых дней.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. Мы ждём вас ================= -->
+<section class="wait">
+  <div class="wrap">
+    <span class="vline-l rv-vline"></span>
+    <span class="vline-r rv-vline" style="--d:.3s"></span>
+    <div class="wait__title">
+      <h2 class="caps rv">Мы ждём</h2>
+      <span class="script script--soft rv-write" style="--d:.5s">Вас</span>
+    </div>
+    <div class="wait__body">
+      <div class="bignums">
+        <div class="rv" style="--d:.2s" data-f="dd"></div>
+        <div class="rv" style="--d:.45s" data-f="mm"></div>
+        <div class="rv" style="--d:.7s" data-f="yy"></div>
+      </div>
+      <div class="calendar rv" style="--d:.3s" id="calendar"></div>
+      <div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 6. Локация ================= -->
+<section class="loc paper">
+  <div class="wrap">
+    <h2 class="script rv-write">Локация</h2>
+    <div class="caps rv" style="--d:.3s">Наша свадьба пройдёт в</div>
+    <div class="loc__photos">
+      <div class="loc__side rv-left" style="--d:.5s"><img src="photos/location1.jpg" data-ph="600x630" alt="" onerror="ph(this)"></div>
+      <div class="loc__card rv" style="--d:.3s">
+        <div class="img"><img src="photos/location2.jpg" data-ph="800x760" alt="" onerror="ph(this)"></div>
+        <div class="loc__name">Ресторан «Atlantida»</div>
+        <div class="loc__addr">Адрес: г. Комрат, ул. Ленина, 233</div>
+      </div>
+      <div class="loc__side rv-right" style="--d:.5s"><img src="photos/location3.jpg" data-ph="600x630" alt="" onerror="ph(this)"></div>
+    </div>
+    <!-- Ссылка на маршрут в Google Картах -->
+    <a class="btn rv" style="--d:.4s" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=%D0%A0%D0%B5%D1%81%D1%82%D0%BE%D1%80%D0%B0%D0%BD+Atlantida+%D0%9A%D0%BE%D0%BC%D1%80%D0%B0%D1%82+%D1%83%D0%BB.+%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%D0%B0+233">Как добраться</a>
+  </div>
+</section>
+
+<!-- ================= 9. Таймер ================= -->
+<section class="countdown">
+  <div class="wrap">
+    <h2 class="caps rv">До нашего вечера осталось</h2>
+    <div class="torn rv-zoom" style="--d:.2s">
+      <div class="torn__back" data-torn="7"></div>
+      <div class="torn__front" data-torn="9"></div>
+      <div class="timer">
+        <div><div class="timer__num" data-u="d">00</div><div class="timer__label" data-l="d">Дней</div></div>
+        <div><div class="timer__num" data-u="h">00</div><div class="timer__label" data-l="h">Часов</div></div>
+        <div><div class="timer__num" data-u="m">00</div><div class="timer__label" data-l="m">Минут</div></div>
+        <div><div class="timer__num" data-u="s">00</div><div class="timer__label" data-l="s">Секунд</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 10. Пожелания ================= -->
+<section class="wish paper">
+  <div class="wrap">
+    <h2 class="script script--title rv-write">Пожелания</h2>
+    <div class="wish__grid">
+      <div class="wish__icon draw" style="--len:420">
+        <svg viewBox="0 0 140 120">
+          <path d="M22 62l70-26 22 58-70 26z" style="--d:.2s"/>
+          <path d="M22 62l52 22 40-48" style="--d:.6s"/>
+          <path d="M60 44C46 30 44 12 58 10c8-1 12 6 12 12 3-9 13-14 20-7 9 10-6 26-24 38" style="--d:1s"/>
+        </svg>
+      </div>
+      <div class="wish__right">
+        <div class="btn-row">
+          <div class="wish__rule rv-line" style="--d:.2s"></div>
+          <div class="slider rv" style="--d:.4s">
+            <div class="slider__stage">
+              <div class="slide"><p>Вместо цветов можно принести бутылочку напитка, который вы любите сами. Мы сохраним её до особого случая, а когда откроем — с теплом вспомним вас и этот прекрасный вечер.</p></div>
+              <div class="slide"><p>Берите с собой хорошее настроение, улыбки и желание красиво провести этот вечер.</p></div>
+            </div>
+            <div class="slider__nav"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 11. Контакты ================= -->
+<section class="contacts">
+  <div class="wrap">
+    <div class="contacts__title">
+      <span class="script script--soft rv-write">Наши</span>
+      <h2 class="caps rv" style="--d:.3s">Контакты</h2>
+    </div>
+    <p class="sub rv" style="--d:.4s">По всем вопросам, связанным с мероприятием, вы можете связаться с нами:</p>
+    <div class="contacts__people">
+      <div class="person rv" style="--d:.5s">
+        <img class="person__name" src="assets/name-bride.png" alt="Юлия">
+        <a href="tel:+37378027063"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg>+373 78 027 063</a>
+      </div>
+      <div class="person rv" style="--d:.65s">
+        <img class="person__name" src="assets/name-groom.png" alt="Константин">
+        <a href="tel:+37367113102"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg>+373 67 113 102</a>
+      </div>
+    </div>
+    <!-- Кнопка «Связаться» — например, ссылка на Telegram -->
+    <a class="btn rv" style="--d:.7s" href="https://t.me/" target="_blank" rel="noopener">Связаться</a>
+  </div>
+</section>
+
+<!-- ================= 12. Фото с сердцем ================= -->
+<section class="final">
+  <div class="final__photo">
+    <div class="img rv-zoom"><img src="photos/final.jpg" data-ph="800x1200" alt="" onerror="ph(this)"></div>
+    <svg class="final__heart draw" style="--len:600; --d:.6s" viewBox="0 0 120 200">
+      <path d="M4 4c30 30 52 60 58 104C50 84 22 70 26 48 30 26 58 34 62 60c6-24 34-30 42-10 10 26-26 60-42 96-6 14-8 30-4 50"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ================= 14. Футер ================= -->
+<footer class="footer">
+  <h2 class="caps rv">До скорой<br>встречи!</h2>
+  <div class="footer__paper">
+    <div class="footer__edge-back" data-torn-top="26"></div>
+    <div class="footer__edge-front" data-torn-top="30"></div>
+    <div class="footer__sign">
+      <div class="script soft rv-write">With Love</div>
+      <img class="names rv-write" style="--d:.6s" src="assets/names.png" alt="Константин и Юлия">
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ======================= НАСТРОЙКИ ======================= */
+  const CONFIG = {
+    groom: "Константин",
+    bride: "Юлия",
+    date: new Date(2026, 9, 23, 19, 0),   // год, месяц (0 = январь, 9 = октябрь), день, часы, минуты
+  };
+  /* ========================================================= */
+
+  const pad = n => String(n).padStart(2, "0");
+  const d = CONFIG.date;
+  const fields = {
+    groom: CONFIG.groom, bride: CONFIG.bride,
+    dd: pad(d.getDate()), mm: pad(d.getMonth() + 1), yy: String(d.getFullYear()).slice(-2),
+    dateFull: `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`
+  };
+  document.querySelectorAll("[data-f]").forEach(el => el.textContent = fields[el.dataset.f]);
+  document.title = `${CONFIG.groom} и ${CONFIG.bride} — Our Evening`;
+
+  /* ---------- Календарь ---------- */
+  (function () {
+    const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+    const first = new Date(d.getFullYear(), d.getMonth(), 1);
+    const total = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    const offset = (first.getDay() + 6) % 7;
+    let html = `<div class="calendar__month">${months[d.getMonth()]}</div><div class="calendar__grid">`;
+    for (let i = 0; i < offset; i++) html += "<span></span>";
+    for (let day = 1; day <= total; day++) {
+      html += day === d.getDate()
+        ? `<span>${day}<svg class="calendar__heart draw" style="--len:260;--d:.9s" viewBox="0 0 60 58"><path d="M31 54C18 44 4 33 5 19 6 8 18 3 27 12c2 2 3 4 4 6 2-6 8-12 16-11 9 1 12 11 8 20-4 10-14 19-24 27-2 1-5-1-3-3"/></svg></span>`
+        : `<span>${day}</span>`;
+    }
+    document.getElementById("calendar").innerHTML = html + "</div>";
+  })();
+
+  /* ---------- Рваные края бумаги ---------- */
+  function rnd(seed) { return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+  document.querySelectorAll("[data-torn]").forEach((el, i) => {
+    const r = rnd(1234 + i * 99), jag = +el.dataset.torn, steps = 46, top = [], bot = [];
+    for (let s = 0; s <= steps; s++) {
+      const x = (s / steps * 100).toFixed(2);
+      top.push(`${x}% ${(r() * jag).toFixed(2)}%`);
+      bot.unshift(`${x}% ${(100 - r() * jag).toFixed(2)}%`);
+    }
+    el.style.clipPath = `polygon(${top.concat(bot).join(",")})`;
+  });
+  document.querySelectorAll("[data-torn-top]").forEach((el, i) => {
+    const r = rnd(777 + i * 31), jag = +el.dataset.tornTop, steps = 60, pts = [];
+    for (let s = 0; s <= steps; s++) {
+      const wave = Math.sin(s / steps * Math.PI * 2.2) * jag * .35 + jag * .5;
+      pts.push(`${(s / steps * 100).toFixed(2)}% ${(wave + r() * jag * .35).toFixed(2)}px`);
+    }
+    el.style.clipPath = `polygon(${pts.join(",")},100% 100%,0 100%)`;
+  });
+
+  /* ---------- Таймер ---------- */
+  function plural(n, forms) {
+    const a = n % 100, b = n % 10;
+    return forms[a > 10 && a < 20 ? 2 : b === 1 ? 0 : b > 1 && b < 5 ? 1 : 2];
+  }
+  const U = {}, L = {};
+  document.querySelectorAll("[data-u]").forEach(e => U[e.dataset.u] = e);
+  document.querySelectorAll("[data-l]").forEach(e => L[e.dataset.l] = e);
+  function tick() {
+    const s = Math.max(0, Math.floor((d - new Date()) / 1000));
+    const v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
+    U.d.textContent = pad(v.d); U.h.textContent = pad(v.h); U.m.textContent = pad(v.m); U.s.textContent = pad(v.s);
+    L.d.textContent = plural(v.d, ["День", "Дня", "Дней"]);
+    L.h.textContent = plural(v.h, ["Час", "Часа", "Часов"]);
+    L.m.textContent = plural(v.m, ["Минута", "Минуты", "Минут"]);
+    L.s.textContent = plural(v.s, ["Секунда", "Секунды", "Секунд"]);
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------- Слайдеры ---------- */
+  const arrow = dir => `<svg viewBox="0 0 24 24"><path d="${dir < 0 ? "M16 3 7 12l9 9" : "M8 3l9 9-9 9"}"/></svg>`;
+  document.querySelectorAll(".slider").forEach(sl => {
+    const slides = sl.querySelectorAll(".slide"), nav = sl.querySelector(".slider__nav");
+    let i = 0;
+    nav.innerHTML = `<button type="button" aria-label="Назад">${arrow(-1)}</button><span></span><button type="button" aria-label="Вперёд">${arrow(1)}</button>`;
+    const [prev, count, next] = nav.children;
+    const show = n => {
+      i = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle("active", k === i));
+      count.textContent = `${i + 1}/${slides.length}`;
+    };
+    prev.onclick = () => show(i - 1);
+    next.onclick = () => show(i + 1);
+    let x0 = null;
+    sl.addEventListener("touchstart", e => x0 = e.touches[0].clientX, { passive: true });
+    sl.addEventListener("touchend", e => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+    show(0);
+  });
+
+  /* ---------- Длина линий для «рисования» ---------- */
+  document.querySelectorAll(".draw").forEach(el => {
+    el.querySelectorAll("path, circle, rect, line").forEach(p => {
+      try { const len = Math.ceil(p.getTotalLength()) + 2; p.style.setProperty("--len", len); } catch (_) {}
+    });
+  });
+
+  /* ---------- Появление при прокрутке ---------- */
+  const revealSel = ".rv, .rv-left, .rv-right, .rv-zoom, .rv-fade, .rv-write, .rv-line, .rv-vline, .draw";
+  // Элементы, которые до появления обрезаны или сжаты до нуля, браузер считает невидимыми —
+  // для них следим за родителем.
+  const proxied = new Map();
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    (proxied.get(e.target) || [e.target]).forEach(el => el.classList.add("in"));
+    io.unobserve(e.target);
+  }), { threshold: .12, rootMargin: "0px 0px -6% 0px" });
+  function observe(el) {
+    if (!el.matches(".rv-write, .rv-line, .rv-vline")) return io.observe(el);
+    const p = el.parentElement;
+    if (!proxied.has(p)) { proxied.set(p, []); io.observe(p); }
+    proxied.get(p).push(el);
+  }
+
+  function start() {
+    document.getElementById("loader").classList.add("done");
+    document.body.classList.remove("loading");
+    document.querySelectorAll("[data-hero]").forEach(el => el.classList.add("in"));
+    if (location.search.includes("static")) { // режим для проверки: показать всё сразу
+      document.documentElement.classList.add("static");
+      document.querySelectorAll(revealSel).forEach(el => el.classList.add("in"));
+      return;
+    }
+    document.querySelectorAll(revealSel).forEach(el => { if (!el.hasAttribute("data-hero")) observe(el); });
+  }
+  let started = false;
+  const go = () => { if (!started) { started = true; setTimeout(start, 500); } };
+  window.addEventListener("load", go);
+  setTimeout(go, 2500);
+
+</script>
+</body>
+</html>

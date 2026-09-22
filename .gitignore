@@ -1,0 +1,6 @@
+# Исходники и служебные файлы — не публикуем
+*.mp4
+Foto*.JPG
+Rest*.PNG
+index-v1.html
+.claude/
